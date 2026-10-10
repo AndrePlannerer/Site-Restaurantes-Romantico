@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Restaurantes Românticos na Liberdade</title>
+<meta name="description" content="Onde levar alguém para jantar na Liberdade, em São Paulo, numa quinta à noite — com opções para aniversário de namoro e estimativa de preço.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf6f0;
+    --surface: #ffffff;
+    --ink: #2a2320;
+    --muted: #6f6359;
+    --line: #e6ddd2;
+    --accent: #b3261e;
+    --accent-soft: #f6e3e0;
+    --gold: #9a6b1f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17130f;
+      --surface: #211b16;
+      --ink: #f1e9df;
+      --muted: #b3a597;
+      --line: #3a3028;
+      --accent: #ef7d72;
+      --accent-soft: #3a211d;
+      --gold: #d9ab5c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17130f; --surface: #211b16; --ink: #f1e9df; --muted: #b3a597;
+    --line: #3a3028; --accent: #ef7d72; --accent-soft: #3a211d; --gold: #d9ab5c;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.6 "Inter", system-ui, sans-serif;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+
+  header { padding: 64px 0 32px; border-bottom: 1px solid var(--line); }
+  .kicker { color: var(--accent); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 13px; }
+  h1, h2, h3 { font-family: "Fraunces", Georgia, serif; font-weight: 600; line-height: 1.2; }
+  h1 { font-size: clamp(32px, 6vw, 48px); margin: 8px 0 12px; }
+  header p { color: var(--muted); margin: 0; max-width: 60ch; }
+
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+  nav a {
+    color: var(--ink); text-decoration: none; font-size: 14px;
+    border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; background: var(--surface);
+  }
+  nav a:hover { border-color: var(--accent); color: var(--accent); }
+
+  section { padding: 48px 0 16px; }
+  .step { color: var(--gold); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+  section > h2 { font-size: 28px; margin: 4px 0 8px; }
+  .lead { color: var(--muted); margin: 0 0 24px; max-width: 65ch; }
+
+  .note {
+    background: var(--accent-soft); border-left: 3px solid var(--accent);
+    padding: 12px 16px; border-radius: 6px; margin: 0 0 24px; font-size: 15px;
+  }
+
+  .cards { display: grid; gap: 16px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px;
+  }
+  .card.pick { border-color: var(--accent); }
+  .card-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .card h3 { font-size: 21px; margin: 0; }
+  .badge {
+    font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft);
+    border-radius: 999px; padding: 2px 10px; white-space: nowrap;
+  }
+  .meta { color: var(--muted); font-size: 14px; margin: 6px 0 10px; }
+  .card p { margin: 0 0 8px; }
+  .card .warn { color: var(--muted); font-size: 14px; }
+  .card .warn::before { content: "Atenção: "; font-weight: 600; color: var(--ink); }
+  .price { font-family: "Fraunces", Georgia, serif; font-size: 22px; color: var(--accent); white-space: nowrap; }
+
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 24px; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+  td.num { white-space: nowrap; font-weight: 600; }
+  .table-scroll { overflow-x: auto; }
+
+  .sources { font-size: 14px; color: var(--muted); padding-left: 18px; }
+  .sources a { color: var(--ink); }
+
+  footer { border-top: 1px solid var(--line); margin-top: 48px; padding: 24px 0 48px; color: var(--muted); font-size: 14px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Liberdade · São Paulo</div>
+    <h1>Restaurantes românticos para uma quinta à noite</h1>
+    <p>Onde levar alguém para jantar no bairro japonês: izakayas para um date descontraído, sushi caprichado para comemorar e quanto o casal deve gastar.</p>
+    <nav>
+      <a href="#date">1 · Date na quinta</a>
+      <!-- nav: próximas etapas -->
+    </nav>
+  </header>
+
+  <section id="date">
+    <div class="step">Etapa 1</div>
+    <h2>Date na Liberdade, quinta à noite</h2>
+    <p class="lead">Todos estes abrem na quinta à noite, mas a Liberdade fecha cedo: a maioria encerra às 22h.</p>
+    <p class="note">Chegue até umas 20h. Se for no mesmo dia, ligue para o Kaburá para confirmar mesa.</p>
+
+    <div class="cards">
+      <article class="card pick">
+        <div class="card-head"><h3>Izakayá Kaburá</h3><span class="badge">Escolha principal</span></div>
+        <div class="meta">Izakaya · R. Galvão Bueno, 346 · Qui 18h30–22h · (11) 3277-2918</div>
+        <p>Pequeno e intimista, comandado por pai e filho. Peixe grelhado e espetinhos na brasa, com boa playlist.</p>
+        <p class="warn">algumas avaliações dizem que os garçons interrompem bastante e oferecem petiscos que depois são cobrados.</p>
+      </article>
+
+      <article class="card">
+        <div class="card-head"><h3>Izakaya Issa</h3><span class="badge">Mais elogiado</span></div>
+        <div class="meta">Izakaya · Qui 18h–22h · Não aceita reserva</div>
+        <p>Conhecido pelo karaage, o takoyaki e uma boa seleção de whisky japonês.</p>
+        <p class="warn">a fila na porta pode ser longa. Chegue cedo e fique atento quando chamarem seu nome.</p>
+      </article>
+
+      <article class="card">
+        <div class="card-head"><h3>Izakayada Boteco Japonês</h3><span class="badge">Drinks</span></div>
+        <div class="meta">Boteco japonês · Qui 18h–22h</div>
+        <p>Decoração cheia de objetos de cultura pop e drinks que misturam Japão e Brasil. Sentem no balcão.</p>
+      </article>
+
+      <article class="card">
+        <div class="card-head"><h3>Cho Sun Gal Bi</h3><span class="badge">Churrasco coreano</span></div>
+        <div class="meta">Coreano · Qui 17h30–21h30</div>
+        <p>Carne grelhada na mesa, com o ambiente mais caprichado desta lista. É o mais caro.</p>
+        <p class="warn">fecha às 21h30, e avaliações recentes dizem que a carne caiu de qualidade.</p>
+      </article>
+
+      <article class="card">
+        <div class="card-head"><h3>Porque Sim</h3><span class="badge">Plano B</span></div>
+        <div class="meta">Japonês caseiro · Qui 18h–22h</div>
+        <p>Comida caseira, boa e barata. Funciona se as filas estiverem grandes.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- próximas etapas -->
+
+  <footer>
+    Horários e telefones do Google Maps, consultados em outubro de 2026. Confirme antes de ir.
+  </footer>
+</div>
+</body>
+</html>
