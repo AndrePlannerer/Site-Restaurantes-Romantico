@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nossos Lugares</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
+<style>
+  :root{
+    --paper:#E3DCC8;
+    --paper-card:#F7F1E3;
+    --ink:#26323A;
+    --ink-soft:#5C6B71;
+    --accent:#A23E32;
+    --accent-ink:#F7F1E3;
+    --trail:#3F6659;
+    --gold:#B8862E;
+    --line: rgba(38,50,58,0.16);
+    --shadow: rgba(38,50,58,0.22);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#1D1911;
+      --paper-card:#292319;
+      --ink:#EEE6D3;
+      --ink-soft:#B4A98F;
+      --accent:#E2786A;
+      --accent-ink:#1D1911;
+      --trail:#7BAE9B;
+      --gold:#D8AC55;
+      --line: rgba(238,230,211,0.16);
+      --shadow: rgba(0,0,0,0.5);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#1D1911;
+    --paper-card:#292319;
+    --ink:#EEE6D3;
+    --ink-soft:#B4A98F;
+    --accent:#E2786A;
+    --accent-ink:#1D1911;
+    --trail:#7BAE9B;
+    --gold:#D8AC55;
+    --line: rgba(238,230,211,0.16);
+    --shadow: rgba(0,0,0,0.5);
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{
+    max-width: 560px;
+    margin: 0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+    position:relative;
+  }
+  .topbar{
+    padding: 28px 20px 8px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .brand-mark{
+    font-size: 30px;
+    line-height:1;
+    transform: rotate(-8deg);
+  }
+  .topbar h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size: 26px;
+    margin:0;
+    letter-spacing: -0.01em;
+  }
+  .tagline{
+    margin: 2px 0 0;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  .tabs{
+    display:flex;
+    gap:6px;
+    padding: 14px 20px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .tab-btn{
+    appearance:none;
+    border:none;
+    background:transparent;
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    color: var(--ink-soft);
+    padding: 8px 4px 12px;
+    cursor:pointer;
+    position:relative;
+    margin-right: 18px;
+  }
+  .tab-btn.active{ color: var(--ink); }
+  .tab-btn.active::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:-1px;
+    height:2px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  main#content{
+    flex:1;
+    padding: 18px 20px 10px;
+  }
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  /* empty state */
+  .empty{
+    text-align:center;
+    padding: 56px 20px;
+    color: var(--ink-soft);
+  }
+  .empty .doodle{ font-size:38px; display:block; margin-bottom:10px; opacity:.8; }
+  .empty h3{
+    font-family:'Fraunces',serif;
+    color: var(--ink);
+    font-weight:600;
+    font-size:19px;
+    margin: 0 0 6px;
+  }
+  .empty p{ font-size:14px; margin:0 auto 18px; max-width:280px; line-height:1.5; }
+
+  .btn-primary{
+    appearance:none; border:none; cursor:pointer;
+    background: var(--accent); color: var(--accent-ink);
+    font-family:'Inter',sans-serif; font-weight:600; font-size:14.5px;
+    padding: 12px 20px; border-radius: 8px;
+  }
+  .btn-primary:disabled{ opacity:.55; cursor:default; }
+  .btn-ghost{
+    appearance:none; cursor:pointer;
+    background:transparent; border: 1px solid var(--line); color: var(--ink);
+    font-family:'Inter',sans-serif; font-weight:600; font-size:14.5px;
+    padding: 11px 18px; border-radius: 8px;
+  }
+
+  /* map view */
+  .map-note{ font-size:12.5px; color:var(--ink-soft); margin: 0 0 12px; }
+  .map-wrap{
+    background: var(--paper-card);
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    padding: 6px;
+    box-shadow: 0 6px 18px -10px var(--shadow);
+  }
+  .map-wrap svg{ display:block; width:100%; height:auto; }
+  .grat-line{ stroke: var(--ink); stroke-opacity:.14; stroke-width:1; stroke-dasharray:2 4; }
+  .grat-label{ font-family:'Space Mono',monospace; font-size:7.5px; fill: var(--ink-soft); }
+  .trail-line{ stroke: var(--trail); stroke-width:1.6; stroke-dasharray:1 5; stroke-linecap:round; fill:none; }
+  .pin{ cursor:pointer; }
+  .pin path{ fill: var(--accent); stroke: var(--paper-card); stroke-width:1.4; }
+  .pin circle.dot{ fill: var(--paper-card); }
+  .pin text{ font-family:'Space Mono',monospace; font-size:8px; fill: var(--ink); }
+  .compass{ opacity:.75; }
+  .compass text{ font-family:'Space Mono',monospace; font-size:8px; fill: var(--ink-soft); }
+  .compass circle{ fill:none; stroke: var(--ink-soft); stroke-width:1; }
+
+  .chip-row{
+    display:flex; gap:8px; overflow-x:auto; padding: 14px 2px 4px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .chip{
+    flex: 0 0 auto;
+    display:flex; align-items:center; gap:7px;
+    background: var(--paper-card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 12px 6px 6px;
+    cursor:pointer;
+    font-size:12.5px;
+    font-weight:500;
+  }
+  .chip img{ width:22px; height:22px; border-radius:999px; object-fit:cover; display:block; }
+  .chip .no-loc{ color: var(--ink-soft); font-style:italic; }
+
+  /* gallery */
+  .gallery-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 14px;
+  }
+  .pcard{
+    background: var(--paper-card);
+    border-radius: 4px;
+    padding: 8px 8px 12px;
+    box-shadow: 0 8px 16px -10px var(--shadow);
+    cursor:pointer;
+  }
+  .pcard:nth-child(3n+1){ transform: rotate(-1.1deg); }
+  .pcard:nth-child(3n+2){ transform: rotate(0.8deg); }
+  .pcard:nth-child(3n){ transform: rotate(-0.4deg); }
+  .pcard .thumb{
+    width:100%; aspect-ratio: 4/5; object-fit:cover; border-radius:2px;
+    background: var(--line);
+    display:block;
+  }
+  .pcard h4{
+    font-family:'Fraunces',serif; font-weight:600; font-size:14.5px;
+    margin: 9px 0 2px; line-height:1.25;
+  }
+  .pcard .stamp{
+    font-family:'Space Mono',monospace; font-size:10px; color: var(--ink-soft);
+  }
+
+  /* fab */
+  .fab{
+    position:fixed;
+    right: 24px;
+    bottom: calc(26px + env(safe-area-inset-bottom));
+    width:56px; height:56px; border-radius:50%;
+    background: var(--accent); color: var(--accent-ink);
+    border:none; font-size:28px; line-height:1;
+    box-shadow: 0 10px 22px -8px var(--shadow);
+    cursor:pointer;
+    z-index: 30;
+  }
+
+  .banner{
+    margin: 0 20px 4px;
+    background: var(--paper-card);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .hidden{ display:none !important; }
+
+  /* overlay + sheet */
+  .overlay{
+    position:fixed; inset:0;
+    background: rgba(20,16,10,0.42);
+    display:flex; align-items:flex-end;
+    z-index: 50;
+  }
+  .sheet{
+    background: var(--paper);
+    width:100%;
+    max-width: 560px;
+    margin: 0 auto;
+    border-radius: 18px 18px 0 0;
+    padding: 10px 20px calc(24px + env(safe-area-inset-bottom));
+    max-height: 88vh;
+    overflow-y:auto;
+    box-shadow: 0 -10px 30px var(--shadow);
+  }
+  .sheet-handle{
+    width:36px; height:4px; background: var(--line);
+    border-radius:4px; margin: 6px auto 14px;
+  }
+  .sheet h2{
+    font-family:'Fraunces',serif; font-weight:600; font-size:20px;
+    margin: 0 0 16px;
+  }
+  .photo-drop{
+    display:flex; align-items:center; justify-content:center;
+    border: 1.5px dashed var(--line);
+    border-radius: 10px;
+    padding: 40px 16px;
+    font-size:15px; font-weight:500; color: var(--ink-soft);
+    cursor:pointer;
+    margin-bottom: 6px;
+    text-align:center;
+  }
+  .field{ margin: 14px 0; }
+  .field label{ display:block; font-size:12.5px; font-weight:600; color: var(--ink-soft); margin-bottom:6px; }
+  .field input[type=text], .field textarea{
+    width:100%; font-family:'Inter',sans-serif; font-size:15px;
+    background: var(--paper-card); border:1px solid var(--line); border-radius:8px;
+    padding: 10px 12px; color: var(--ink); resize: vertical;
+  }
+  .preview-img{
+    width:100%; max-height: 260px; object-fit:cover; border-radius:10px; margin-bottom: 4px;
+  }
+  .coord-stamp{
+    font-family:'Space Mono',monospace; font-size:12px; color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .manual-coords{ margin-top:10px; }
+  .manual-coords .hint{ font-size:12.5px; color: var(--ink-soft); margin: 0 0 8px; line-height:1.4; }
+  .coord-inputs{ display:flex; gap:8px; }
+  .coord-inputs input{
+    flex:1; font-family:'Space Mono',monospace; font-size:13px;
+    background: var(--paper-card); border:1px solid var(--line); border-radius:8px;
+    padding: 9px 10px; color: var(--ink);
+  }
+  .sheet-actions{ display:flex; gap:10px; margin-top: 20px; }
+  .sheet-actions .btn-primary, .sheet-actions .btn-ghost{ flex:1; text-align:center; }
+
+  .detail-photo{ width:100%; max-height:320px; object-fit:cover; border-radius:10px; }
+  .detail-name{ font-family:'Fraunces',serif; font-weight:600; font-size:22px; margin: 14px 0 4px; }
+  .detail-stamp{ font-family:'Space Mono',monospace; font-size:12.5px; color: var(--ink-soft); }
+  .detail-note{ font-size:14.5px; line-height:1.55; margin: 14px 0; }
+  .detail-links{ display:flex; flex-direction:column; gap:10px; margin-top: 18px; }
+  .maplink{
+    display:inline-flex; align-items:center; gap:6px;
+    color: var(--trail); font-weight:600; font-size:14px; text-decoration:none;
+  }
+  .danger-zone{ margin-top: 22px; padding-top:16px; border-top:1px solid var(--line); }
+  .btn-danger{
+    appearance:none; cursor:pointer; background:transparent;
+    border: 1px solid var(--accent); color: var(--accent);
+    font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px;
+    padding: 9px 14px; border-radius:8px;
+  }
+
+  .toast{
+    position:fixed; left:50%; bottom: calc(96px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    background: var(--ink); color: var(--paper);
+    font-size:13.5px; font-weight:500;
+    padding: 11px 18px; border-radius: 999px;
+    z-index: 80;
+    box-shadow: 0 8px 20px -6px rgba(0,0,0,0.4);
+  }
+  .spinner-line{ text-align:center; color: var(--ink-soft); font-size:14px; padding: 40px 0; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <span class="brand-mark">🧭</span>
+    <div>
+      <h1>Nossos Lugares</h1>
+      <p class="tagline">um mapa dos lugares que a gente já foi</p>
+    </div>
+  </header>
+
+  <div id="banner-readonly" class="banner hidden">
+    Abra este app pelo Claude com sua conta para salvar e ver os lugares.
+  </div>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="map">Mapa</button>
+    <button class="tab-btn" data-tab="gallery">Galeria</button>
+  </nav>
+
+  <main id="content">
+    <section id="view-map" class="view active">
+      <div class="spinner-line" id="map-loading">carregando lugares...</div>
+    </section>
+    <section id="view-gallery" class="view">
+      <div class="spinner-line">carregando lugares...</div>
+    </section>
+  </main>
+
+  <button id="fab-add" class="fab" aria-label="Adicionar lugar">+</button>
+
+  <!-- add sheet -->
+  <div id="sheet-overlay" class="overlay hidden">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2>Novo lugar</h2>
+
+      <div id="add-step-picker">
+        <label class="photo-drop" for="photo-input">📷 Escolher uma foto</label>
+        <input type="file" id="photo-input" accept="image/*" hidden>
+      </div>
+
+      <div id="add-step-form" class="hidden">
+        <img id="preview-img" class="preview-img" alt="Prévia da foto">
+        <div class="coord-stamp" id="coord-display"></div>
+
+        <div id="manual-coords" class="manual-coords hidden">
+          <p class="hint">Essa foto não veio com localização salva (é comum quando o GPS do celular está desligado). Se quiser, digite as coordenadas — ou deixe em branco e o lugar fica só na galeria.</p>
+          <div class="coord-inputs">
+            <input id="input-lat" type="number" step="any" placeholder="latitude, ex: -23.5505">
+            <input id="input-lng" type="number" step="any" placeholder="longitude, ex: -46.6333">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Nome do lugar</label>
+          <input id="input-name" type="text" placeholder="Como vocês chamam esse lugar?">
+        </div>
+        <div class="field">
+          <label>Nota (opcional)</label>
+          <textarea id="input-note" rows="2" placeholder="Alguma lembrança daquele dia..."></textarea>
+        </div>
+
+        <div class="sheet-actions">
+          <button class="btn-ghost" id="btn-cancel">Cancelar</button>
+          <button class="btn-primary" id="btn-save">Salvar lugar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- detail sheet -->
+  <div id="detail-overlay" class="overlay hidden">
+    <div class="sheet" id="detail-sheet"></div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var db = null, assetsApi = null, unsub = null;
+  var places = [];
+  var pending = null; // {blob, previewUrl, lat, lng, dateIso}
+  var currentTab = 'map';
+  var confirmingDeleteId = null;
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  function toast(msg){
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.remove('hidden');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function(){ t.classList.add('hidden'); }, 2600);
+  }
+
+  // ---------- init ----------
+  function init(){
+    if (!window.claude || typeof window.claude.use !== 'function'){
+      $('banner-readonly').classList.remove('hidden');
+      renderEmptyOnly();
+      return;
+    }
+    Promise.all([window.claude.use('db'), window.claude.use('assets')]).then(function(res){
+      db = res[0]; assetsApi = res[1];
+      if (!db){
+        $('banner-readonly').classList.remove('hidden');
+        renderEmptyOnly();
+        return;
+      }
+      subscribe();
+    }).catch(function(){
+      $('banner-readonly').classList.remove('hidden');
+      renderEmptyOnly();
+    });
+  }
+
+  function subscribe(){
+    var col = db.collection('places');
+    unsub = col.orderBy('createdAt','desc').onSnapshot(function(snap){
+      places = snap.docs.map(function(d){ var data = d.data() || {}; data.id = d.id; return data; });
+      renderAll();
+    }, function(err){
+      toast('não consegui carregar os lugares');
+    });
+  }
+
+  function renderEmptyOnly(){
+    $('view-map').innerHTML = emptyStateHtml();
+    $('view-gallery').innerHTML = emptyStateHtml();
+  }
+
+  function emptyStateHtml(){
+    return '<div class="empty"><span class="doodle">🗺️</span>' +
+      '<h3>ainda não tem nada aqui</h3>' +
+      '<p>toque no + e manda a primeira foto de um lugar que vocês foram juntos</p></div>';
+  }
+
+  // ---------- tabs ----------
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      $('view-' + currentTab).classList.add('active');
+    });
+  });
+
+  // ---------- rendering ----------
+  function renderAll(){
+    renderMap();
+    renderGallery();
+  }
+
+  function fmtCoord(lat,lng){
+    if (lat === null || lat === undefined || lng === null || lng === undefined) return 'sem localização';
+    var latAbs = Math.abs(lat).toFixed(4), lngAbs = Math.abs(lng).toFixed(4);
+    return latAbs + '°' + (lat>=0?'N':'S') + '  ' + lngAbs + '°' + (lng>=0?'L':'O');
+  }
+  function fmtDate(iso){
+    if (!iso) return 'data desconhecida';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return 'data desconhecida';
+    return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'});
+  }
+  function hasCoords(p){ return p.lat !== null && p.lat !== undefined && p.lng !== null && p.lng !== undefined; }
+
+  function renderMap(){
+    var el = $('view-map');
+    if (!places.length){ el.innerHTML = emptyStateHtml(); return; }
+
+    var withCoords = places.filter(hasCoords);
+    var chipsHtml = places.map(function(p){
+      var img = p.assetId ? ('<img src="/_blob/' + p.assetId + '" alt="">') : '';
+      return '<div class="chip" data-open="'+p.id+'">' + img +
+        '<span>' + escapeHtml(p.name || 'sem nome') + (hasCoords(p) ? '' : ' <span class="no-loc">·sem local</span>') + '</span></div>';
+    }).join('');
+
+    if (!withCoords.length){
+      el.innerHTML =
+        '<p class="map-note">nenhum lugar salvo tem coordenadas ainda — adicione localização ao salvar uma foto para vê-los aqui.</p>' +
+        '<div class="chip-row">' + chipsHtml + '</div>';
+      bindChipOpens(el);
+      return;
+    }
+
+    var lats = withCoords.map(function(p){ return p.lat; });
+    var lngs = withCoords.map(function(p){ return p.lng; });
+    var bounds = { minLat: Math.min.apply(null,lats), maxLat: Math.max.apply(null,lats),
+                   minLng: Math.min.apply(null,lngs), maxLng: Math.max.apply(null,lngs) };
+    if (bounds.maxLat - bounds.minLat < 0.01){ bounds.minLat -= 0.02; bounds.maxLat += 0.02; }
+    if (bounds.maxLng - bounds.minLng < 0.01){ bounds.minLng -= 0.02; bounds.maxLng += 0.02; }
+
+    var W = 340, H = 420, PAD = 38;
+    function project(lat,lng){
+      var x = PAD + ((lng - bounds.minLng)/(bounds.maxLng - bounds.minLng)) * (W - 2*PAD);
+      var y = PAD + (1 - (lat - bounds.minLat)/(bounds.maxLat - bounds.minLat)) * (H - 2*PAD);
+      return {x:x,y:y};
+    }
+
+    // graticule
+    var grat = '';
+    for (var i=0;i<=3;i++){
+      var gx = PAD + (i/3)*(W-2*PAD);
+      var gy = PAD + (i/3)*(H-2*PAD);
+      grat += '<line class="grat-line" x1="'+gx+'" y1="'+PAD+'" x2="'+gx+'" y2="'+(H-PAD)+'"/>';
+      grat += '<line class="grat-line" x1="'+PAD+'" y1="'+gy+'" x2="'+(W-PAD)+'" y2="'+gy+'"/>';
+    }
+
+    // trail: chronological order
+    var chrono = withCoords.slice().sort(function(a,b){
+      return new Date(a.dateTaken||a.createdAt||0) - new Date(b.dateTaken||b.createdAt||0);
+    });
+    var trailPts = chrono.map(function(p){ var pt = project(p.lat,p.lng); return pt.x+','+pt.y; }).join(' L ');
+    var trail = chrono.length>1 ? '<path class="trail-line" d="M '+trailPts+'"/>' : '';
+
+    // pins
+    var pins = withCoords.map(function(p){
+      var pt = project(p.lat,p.lng);
+      return '<g class="pin" data-open="'+p.id+'" transform="translate('+pt.x+','+pt.y+')">' +
+        '<path d="M0,2 C-8,-6 -8,-18 0,-22 C8,-18 8,-6 0,2 Z"/>' +
+        '<circle class="dot" cx="0" cy="-14" r="3.2"/>' +
+      '</g>';
+    }).join('');
+
+    var compass = '<g class="compass" transform="translate('+(W-30)+',24)">' +
+      '<circle r="13"/><text x="0" y="-16" text-anchor="middle">N</text></g>';
+
+    el.innerHTML =
+      '<p class="map-note">posições relativas entre os lugares salvos — toque num pino pra ver os detalhes, e use o link "abrir no mapa" pra rota de verdade.</p>' +
+      '<div class="map-wrap"><svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">' +
+        grat + trail + pins + compass +
+      '</svg></div>' +
+      '<div class="chip-row">' + chipsHtml + '</div>';
+
+    bindChipOpens(el);
+  }
+
+  function bindChipOpens(root){
+    root.querySelectorAll('[data-open]').forEach(function(node){
+      node.addEventListener('click', function(){ openDetail(node.getAttribute('data-open')); });
+    });
+  }
+
+  function renderGallery(){
+    var el = $('view-gallery');
+    if (!places.length){ el.innerHTML = emptyStateHtml(); return; }
+    var sorted = places.slice().sort(function(a,b){
+      return new Date(b.dateTaken||b.createdAt||0) - new Date(a.dateTaken||a.createdAt||0);
+    });
+    el.innerHTML = '<div class="gallery-grid">' + sorted.map(function(p){
+      var img = p.assetId ? ('/_blob/' + p.assetId) : '';
+      return '<div class="pcard" data-open="'+p.id+'">' +
+        '<img class="thumb" src="'+img+'" alt="' + escapeHtml(p.name||'') + '">' +
+        '<h4>' + escapeHtml(p.name || 'sem nome') + '</h4>' +
+        '<div class="stamp">' + fmtDate(p.dateTaken||p.createdAt) + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+    bindChipOpens(el);
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  // ---------- detail sheet ----------
+  function openDetail(id){
+    var p = places.find(function(x){ return x.id === id; });
+    if (!p) return;
+    confirmingDeleteId = null;
+    renderDetail(p);
+    $('detail-overlay').classList.remove('hidden');
+  }
+  function renderDetail(p){
+    var img = p.assetId ? ('/_blob/' + p.assetId) : '';
+    var mapHref = hasCoords(p) ? ('https://www.google.com/maps?q=' + p.lat + ',' + p.lng) : null;
+    var deleteLabel = confirmingDeleteId === p.id ? 'toque de novo pra confirmar' : 'remover lugar';
+    $('detail-sheet').innerHTML =
+      '<div class="sheet-handle"></div>' +
+      '<img class="detail-photo" src="'+img+'" alt="'+escapeHtml(p.name||'')+'">' +
+      '<div class="detail-name">' + escapeHtml(p.name || 'sem nome') + '</div>' +
+      '<div class="detail-stamp">' + fmtDate(p.dateTaken||p.createdAt) + ' · ' + fmtCoord(p.lat,p.lng) + '</div>' +
+      (p.note ? ('<p class="detail-note">' + escapeHtml(p.note) + '</p>') : '') +
+      '<div class="detail-links">' +
+        (mapHref ? ('<a class="maplink" href="'+mapHref+'" target="_blank" rel="noopener">↗ abrir no mapa</a>') : '') +
+      '</div>' +
+      '<div class="danger-zone"><button class="btn-danger" id="btn-delete">' + deleteLabel + '</button></div>';
+
+    $('btn-delete').addEventListener('click', function(){
+      if (confirmingDeleteId === p.id){
+        deletePlace(p);
+      } else {
+        confirmingDeleteId = p.id;
+        renderDetail(p);
+      }
+    });
+  }
+  function deletePlace(p){
+    var btn = $('btn-delete');
+    if (btn){ btn.disabled = true; btn.textContent = 'removendo...'; }
+    var doDelete = function(){
+      return db.collection('places').doc(p.id).delete();
+    };
+    (p.assetId && assetsApi ? assetsApi.delete(p.assetId).catch(function(){}) : Promise.resolve())
+      .then(doDelete)
+      .then(function(){
+        closeOverlay('detail-overlay');
+        toast('lugar removido');
+      })
+      .catch(function(){
+        toast('não deu pra remover, tenta de novo');
+        if (btn){ btn.disabled = false; btn.textContent = 'remover lugar'; }
+      });
+  }
+
+  function closeOverlay(id){ $(id).classList.add('hidden'); }
+  document.querySelectorAll('.overlay').forEach(function(ov){
+    ov.addEventListener('click', function(e){ if (e.target === ov) closeOverlay(ov.id); });
+  });
+
+  // ---------- add flow ----------
+  $('fab-add').addEventListener('click', function(){
+    if (!db || !assetsApi){
+      toast('abra este app pelo Claude pra salvar lugares');
+      return;
+    }
+    resetAddSheet();
+    $('sheet-overlay').classList.remove('hidden');
+  });
+  $('btn-cancel').addEventListener('click', function(){ closeOverlay('sheet-overlay'); });
+
+  function resetAddSheet(){
+    pending = null;
+    $('add-step-picker').classList.remove('hidden');
+    $('add-step-form').classList.add('hidden');
+    $('input-name').value = '';
+    $('input-note').value = '';
+    $('input-lat').value = '';
+    $('input-lng').value = '';
+    $('photo-input').value = '';
+    $('manual-coords').classList.add('hidden');
+  }
+
+  $('photo-input').addEventListener('change', function(e){
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    $('add-step-picker').innerHTML = '<div class="spinner-line" style="padding:24px 0;">lendo a foto...</div>';
+    readExif(file).then(function(exif){
+      return loadCompressed(file, exif.orientation).then(function(blob){
+        return { exif: exif, blob: blob };
+      });
+    }).then(function(res){
+      var previewUrl = URL.createObjectURL(res.blob);
+      pending = {
+        blob: res.blob,
+        previewUrl: previewUrl,
+        lat: res.exif.lat,
+        lng: res.exif.lng,
+        dateIso: res.exif.dateObj ? res.exif.dateObj.toISOString() : null
+      };
+      $('preview-img').src = previewUrl;
+      $('coord-display').textContent = pending.dateIso ?
+        (fmtDate(pending.dateIso) + ' · ' + fmtCoord(pending.lat, pending.lng)) :
+        fmtCoord(pending.lat, pending.lng);
+      $('manual-coords').classList.toggle('hidden', pending.lat !== null);
+      $('add-step-picker').classList.add('hidden');
+      $('add-step-form').classList.remove('hidden');
+    }).catch(function(err){
+      toast('não consegui ler essa foto, tenta outra');
+      resetAddSheet();
+    });
+  });
+
+  function readExif(file){
+    return new Promise(function(resolve){
+      try{
+        EXIF.getData(file, function(){
+          var lat = EXIF.getTag(this,'GPSLatitude');
+          var latRef = EXIF.getTag(this,'GPSLatitudeRef');
+          var lng = EXIF.getTag(this,'GPSLongitude');
+          var lngRef = EXIF.getTag(this,'GPSLongitudeRef');
+          var dt = EXIF.getTag(this,'DateTimeOriginal');
+          var orientation = EXIF.getTag(this,'Orientation') || 1;
+          var latDec = null, lngDec = null;
+          if (lat && lng && lat.length===3 && lng.length===3){
+            latDec = dmsToDd(lat, latRef);
+            lngDec = dmsToDd(lng, lngRef);
+          }
+          resolve({ lat: latDec, lng: lngDec, dateObj: parseExifDate(dt), orientation: orientation });
+        });
+      } catch(e){
+        resolve({ lat: null, lng: null, dateObj: null, orientation: 1 });
+      }
+    });
+  }
+  function dmsToDd(dms, ref){
+    var dd = dms[0] + dms[1]/60 + dms[2]/3600;
+    return (ref === 'S' || ref === 'W') ? -dd : dd;
+  }
+  function parseExifDate(s){
+    if (!s) return null;
+    var parts = s.split(' ');
+    if (parts.length < 1) return null;
+    var d = parts[0].split(':');
+    if (d.length !== 3) return null;
+    var t = parts[1] || '00:00:00';
+    var dt = new Date(d[0] + '-' + d[1] + '-' + d[2] + 'T' + t);
+    return isNaN(dt.getTime()) ? null : dt;
+  }
+
+  function loadCompressed(file, orientation){
+    return new Promise(function(resolve,reject){
+      var img = new Image();
+      var url = URL.createObjectURL(file);
+      img.onload = function(){
+        var maxDim = 1280;
+        var w = img.width, h = img.height;
+        var scale = Math.min(1, maxDim / Math.max(w,h));
+        var cw = Math.round(w*scale), ch = Math.round(h*scale);
+        var canvas = document.createElement('canvas');
+        var swap = orientation > 4 && orientation < 9;
+        canvas.width = swap ? ch : cw;
+        canvas.height = swap ? cw : ch;
+        var ctx = canvas.getContext('2d');
+        switch(orientation){
+          case 2: ctx.transform(-1,0,0,1,cw,0); break;
+          case 3: ctx.transform(-1,0,0,-1,cw,ch); break;
+          case 4: ctx.transform(1,0,0,-1,0,ch); break;
+          case 5: ctx.transform(0,1,1,0,0,0); break;
+          case 6: ctx.transform(0,1,-1,0,ch,0); break;
+          case 7: ctx.transform(0,-1,-1,0,ch,cw); break;
+          case 8: ctx.transform(0,-1,1,0,0,cw); break;
+          default: break;
+        }
+        ctx.drawImage(img,0,0,cw,ch);
+        URL.revokeObjectURL(url);
+        canvas.toBlob(function(blob){
+          if (blob) resolve(blob); else reject(new Error('toBlob failed'));
+        }, 'image/jpeg', 0.82);
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error('image load failed')); };
+      img.src = url;
+    });
+  }
+
+  $('btn-save').addEventListener('click', function(){
+    if (!pending || !db || !assetsApi) return;
+    var name = $('input-name').value.trim() || 'lugar sem nome';
+    var note = $('input-note').value.trim();
+    var lat = pending.lat, lng = pending.lng;
+    if (lat === null || lng === null){
+      var ml = parseFloat($('input-lat').value), mn = parseFloat($('input-lng').value);
+      if (!isNaN(ml) && !isNaN(mn)){ lat = ml; lng = mn; }
+    }
+    var btn = $('btn-save');
+    btn.disabled = true; btn.textContent = 'salvando...';
+    assetsApi.upload(pending.blob, {type:'image/jpeg'}).then(function(res){
+      return db.collection('places').add({
+        name: name,
+        note: note,
+        lat: (lat === null || lat === undefined || isNaN(lat)) ? null : lat,
+        lng: (lng === null || lng === undefined || isNaN(lng)) ? null : lng,
+        dateTaken: pending.dateIso,
+        assetId: res.id,
+        createdAt: new Date().toISOString()
+      });
+    }).then(function(){
+      closeOverlay('sheet-overlay');
+      toast('lugar salvo!');
+    }).catch(function(err){
+      toast('não deu pra salvar, tenta de novo');
+    }).finally(function(){
+      btn.disabled = false; btn.textContent = 'salvar lugar';
+    });
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>
